@@ -1,5 +1,9 @@
 <?php
-$conn = new mysqli("localhost", "root", "", "testdb");
+$db_host = getenv('DB_HOST') ?: 'localhost';
+$db_user = getenv('DB_USER') ?: 'secure_user';
+$db_pass = getenv('DB_PASS') ?: 'your_strong_password'; // Use a strong password!
+$db_name = getenv('DB_NAME') ?: 'testdb';
+$conn = new mysqli($db_host, $db_user, $db_pass, $db_name);
 if ($conn->connect_error) {
     error_log("Database connection failed: " . $conn->connect_error);
     die("An unexpected error occurred. Please try again later.");
@@ -27,9 +31,9 @@ if ($result->num_rows > 0) {
     if (password_verify($password, $hashed_password_from_db)) {
         echo "Login başarılı";
         // Example for session management:
-        // session_start();
-        // session_regenerate_id(true); // Prevent session fixation
-        // $_SESSION['user_id'] = $user['id'];
+        session_start();
+        session_regenerate_id(true); // Prevent session fixation
+        $_SESSION['user_id'] = $user['id'];
         // header('Location: dashboard.php'); // Redirect to a protected page
         // exit();
     } else {
