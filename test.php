@@ -1,5 +1,9 @@
 <?php
 $conn = new mysqli("localhost", "root", "", "testdb");
+if ($conn->connect_error) {
+    error_log("Database connection failed: " . $conn->connect_error);
+    die("An unexpected error occurred. Please try again later.");
+}
 
 $username = $_POST['username'];
 $password = $_POST['password']; // This is the plain-text password from the form
@@ -8,7 +12,8 @@ $password = $_POST['password']; // This is the plain-text password from the form
 $stmt = $conn->prepare("SELECT id, password FROM users WHERE username = ?");
 if ($stmt === false) {
     // In a production environment, log the error details and display a generic message to the user.
-    die('MySQL prepare error: ' . $conn->error);
+    error_log('MySQL prepare error: ' . $conn->error);
+    die('An unexpected error occurred during login. Please try again later.');
 }
 $stmt->bind_param("s", $username);
 $stmt->execute();
