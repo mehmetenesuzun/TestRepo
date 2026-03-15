@@ -21,7 +21,12 @@ if ($result->num_rows > 0) {
     // Verify the provided plain-text password against the stored hashed password
     if (password_verify($password, $hashed_password_from_db)) {
         echo "Login başarılı";
-        // TODO: Implement session management, e.g., session_start(), session_regenerate_id(true), $_SESSION['user_id'] = $user['id'];
+        // Example for session management:
+        // session_start();
+        // session_regenerate_id(true); // Prevent session fixation
+        // $_SESSION['user_id'] = $user['id'];
+        // header('Location: dashboard.php'); // Redirect to a protected page
+        // exit();
     } else {
         echo "Kullanıcı adı veya şifre hatalı"; // Always use a generic message for security
     }
