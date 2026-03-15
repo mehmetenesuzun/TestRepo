@@ -12,7 +12,6 @@ $query = "SELECT * FROM users WHERE username = '$username' AND password = '$pass
 
 $result = $conn->query($query);
 
-echo
 
 if ($result->num_rows > 0) {
     echo "Login başarılı";
