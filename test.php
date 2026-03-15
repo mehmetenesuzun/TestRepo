@@ -1,20 +1,42 @@
 <?php
 $conn = new mysqli("localhost", "root", "", "testdb");
+if ($conn->connect_error) {
+    error_log("Database connection failed: " . $conn->connect_error);
+    die("An unexpected error occurred. Please try again later.");
+}
 
 $username = $_POST['username'];
-$password = $_POST['password'];
+$password = $_POST['password']; // This is the plain-text password from the form
 
-$query = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";
-$query = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";
-$query = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";
-
-
-$result = $conn->query($query);
+// First, retrieve the hashed password for the given username
+$stmt = $conn->prepare("SELECT id, password FROM users WHERE username = ?");
+if ($stmt === false) {
+    // In a production environment, log the error details and display a generic message to the user.
+    error_log('MySQL prepare error: ' . $conn->error);
+    die('An unexpected error occurred during login. Please try again later.');
+}
+$stmt->bind_param("s", $username);
+$stmt->execute();
+$result = $stmt->get_result();
 
 if ($result->num_rows > 0) {
-    echo "Login başarılı";
+    $user = $result->fetch_assoc();
+    $hashed_password_from_db = $user['password'];
+
+    // Verify the provided plain-text password against the stored hashed password
+    if (password_verify($password, $hashed_password_from_db)) {
+        echo "Login başarılı";
+        // Example for session management:
+        // session_start();
+        // session_regenerate_id(true); // Prevent session fixation
+        // $_SESSION['user_id'] = $user['id'];
+        // header('Location: dashboard.php'); // Redirect to a protected page
+        // exit();
+    } else {
+        echo "Kullanıcı adı veya şifre hatalı"; // Always use a generic message for security
+    }
 } else {
-    echo "Login başarısız";
+    echo "Kullanıcı adı veya şifre hatalı"; // Always use a generic message for security
 }
 ?>
 
