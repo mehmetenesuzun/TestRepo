@@ -1,7 +1,7 @@
 <?php
 $db_host = getenv('DB_HOST') ?: 'localhost';
 $db_user = getenv('DB_USER') ?: 'secure_user';
-$db_pass = getenv('DB_PASS') ?: 'your_strong_password'; // Use a strong password!
+$db_pass = getenv('DB_PASS'); // Ensure this environment variable is set in production. Connection will fail if not set.
 $db_name = getenv('DB_NAME') ?: 'testdb';
 $conn = new mysqli($db_host, $db_user, $db_pass, $db_name);
 if ($conn->connect_error) {
@@ -11,6 +11,7 @@ if ($conn->connect_error) {
 
 $username = $_POST['username'];
 $password = $_POST['password']; // This is the plain-text password from the form
+// This comment highlights a critical prerequisite for the secure login to function correctly. The change is outside the scope of this specific diff, but essential for overall system security. Example for registration/password update: $hashedPassword = password_hash($plainTextPassword, PASSWORD_DEFAULT);
 
 // First, retrieve the hashed password for the given username
 $stmt = $conn->prepare("SELECT id, password FROM users WHERE username = ?");
