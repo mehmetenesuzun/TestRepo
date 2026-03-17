@@ -18,6 +18,8 @@ function goster() {
 
     // ❌ XSS açığı: kullanıcı girdisi direkt HTML'e basılıyor
     document.getElementById("output").innerHTML = value;
+
+    <h1>
 }
 </script>
 
