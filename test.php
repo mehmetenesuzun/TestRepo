@@ -1,39 +1,25 @@
-<?php
-$conn = new mysqli("localhost", "root", "", "testdb");
+<!DOCTYPE html>
+<html>
+<head>
+    <title>XSS Demo</title>
+</head>
+<body>
 
-$username = $_POST['username'];
-$password = $_POST['password'];
+<h2>Mesaj Gönder</h2>
 
-// Ensure $conn is an mysqli object and is connected.
-// Assuming $username and $password are already defined from user input.
+<input type="text" id="input" placeholder="Bir şey yaz">
+<button onclick="goster()">Göster</button>
 
-$stmt = $conn->prepare("SELECT * FROM users WHERE username = ? AND password = ?");
+<p id="output"></p>
 
-if ($stmt === false) {
-    // Handle error appropriately, e.g., log it and return a generic error message.
-    error_log('MySQL prepare error: ' . $conn->error);
-    // In a production environment, avoid exposing raw database errors to users.
-    die('Database error. Please try again later.');
+<script>
+function goster() {
+    const value = document.getElementById("input").value;
+
+    // ❌ XSS açığı: kullanıcı girdisi direkt HTML'e basılıyor
+    document.getElementById("output").innerHTML = value;
 }
+</script>
 
-$stmt->bind_param("ss", $username, $password); // 'ss' indicates two string parameters
-
-$stmt->execute();
-
-$result = $stmt->get_result();
-
-// Continue with fetching results from $result
-
-
-if ($result->num_rows > 0) {
-    echo "Login başarılı";
-} else {
-    echo "Login başarısız";
-}
-?>
-
-<form method="POST">
-    <input type="text" name="username" placeholder="username">
-    <input type="password" name="password" placeholder="password">
-    <button type="submit">Login</button>
-</form>
+</body>
+</html>
