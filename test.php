@@ -4,11 +4,25 @@ $conn = new mysqli("localhost", "root", "", "testdb");
 $username = $_POST['username'];
 $password = $_POST['password'];
 
-$query = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";
+// Ensure $conn is an mysqli object and is connected.
+// Assuming $username and $password are already defined from user input.
 
-$query = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";
+$stmt = $conn->prepare("SELECT * FROM users WHERE username = ? AND password = ?");
 
-$result = $conn->query($query);
+if ($stmt === false) {
+    // Handle error appropriately, e.g., log it and return a generic error message.
+    error_log('MySQL prepare error: ' . $conn->error);
+    // In a production environment, avoid exposing raw database errors to users.
+    die('Database error. Please try again later.');
+}
+
+$stmt->bind_param("ss", $username, $password); // 'ss' indicates two string parameters
+
+$stmt->execute();
+
+$result = $stmt->get_result();
+
+// Continue with fetching results from $result
 
 
 if ($result->num_rows > 0) {
