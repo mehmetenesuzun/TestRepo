@@ -15,9 +15,8 @@
 <script>
 function goster() {
     const value = document.getElementById("input").value;
-
-    // ❌ XSS açığı: kullanıcı girdisi direkt HTML'e basılıyor
-    document.getElementById("output").innerHTML = value;
+    // Güvenli: kullanıcı girdisini sadece metin olarak göster
+    document.getElementById("output").innerText = value;
 }
 </script>
 
