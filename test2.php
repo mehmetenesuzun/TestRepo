@@ -1,36 +1,25 @@
-<?php
-$conn = new mysqli("localhost", "root", "", "testdb");
+from flask import Flask, request
+import sqlite3
 
-// Check database connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+app = Flask(__name__)
 
-$username = $_POST['username'];
-$password = $_POST['password'];
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    username = request.form.get("username")
+    password = request.form.get("password")
 
-// ✅ Use prepared statements with parameterized queries to prevent SQL Injection
-$stmt = $conn->prepare("SELECT * FROM users WHERE username = ? AND password = ?");
-if ($stmt === false) {
-    die("Prepare failed: " . $conn->error);
-}
+    # ❌ SQL Injection açığı
+    conn = sqlite3.connect("users.db")
+    cursor = conn.cursor()
+    query = f"SELECT * FROM users WHERE username = '{username}' AND password = '{password}'"
+    cursor.execute(query)
+    user = cursor.fetchone()
 
-$stmt->bind_param("ss", $username, $password); // "ss" indicates two string parameters
-$stmt->execute();
-$result = $stmt->get_result(); // Get the result set
+    if user:
+        # ❌ XSS açığı
+        return f"<h1>Welcome {username}</h1>"
+    else:
+        return "Login failed"
 
-if ($result->num_rows > 0) {
-    echo "Login başarılı";
-} else {
-    echo "Login başarısız";
-}
-
-$stmt->close();
-$conn->close();
-?>
-
-<form method="POST">
-    <input type="text" name="username" placeholder="username">
-    <input type="password" name="password" placeholder="password">
-    <button type="submit">Login</button>
-</form>
+if __name__ == "__main__":
+    app.run(debug=True)
